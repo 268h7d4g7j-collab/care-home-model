@@ -47,3 +47,11 @@ Resident details and periods are deliberately read-only. Disabled dropdowns show
 The directory is scoped by each resident's latest period. An open resident record remains visible when selectors change, with a notice if it falls outside the selection; its complete history remains visible. Period history includes all snapshots in ascending start-date order. Placeholder modules have no operational functionality.
 
 Work is on `feat/application-foundation` for review before merging. No later modules are implemented.
+
+## GitHub Pages demo
+
+The fictional demo can be served without a Node.js server. `GITHUB_PAGES=true npm run build` exports the site to `out/` with the `/care-home-model` URL prefix and directory-based routes. Normal local development and production builds keep their existing behaviour.
+
+The prepared site is published on the `gh-pages` branch. In the repository's **Settings → Pages**, choose **Deploy from a branch**, select **gh-pages** and **/ (root)**, then **Save**. The expected address is https://268h7d4g7j-collab.github.io/care-home-model/ once GitHub completes deployment. All content is fictional and the site has no authentication or data storage.
+
+To refresh this demo, rebuild with the same command and commit the contents of `out/` to `gh-pages`, including an empty `.nojekyll` file. Keep source development on the review branch; generated files belong only on `gh-pages`.
