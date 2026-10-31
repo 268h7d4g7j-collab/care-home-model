@@ -1,57 +1,41 @@
 # Care Home Revenue
 
-A Next.js / TypeScript visual foundation for a multi-company care home revenue application. All companies, homes, residents, funders, dates and fees are fictional.
+Next.js / TypeScript application for care home revenue management. Task 2A extends the existing interface with resident master creation, reopening and name editing backed by Supabase. Resident masters contain **only ID and name**.
 
-## Run locally
+This branch is **local-only** until authentication and company/home authorization are agreed. Your existing public GitHub Pages demonstration remains unchanged. Do not put Supabase privileged keys in browser code or publish an unrestricted database.
 
-Requires Node.js 20.9 or newer (validated with Node 24) and npm.
+## Setup and run
+
+See [Task 2A setup](docs/task-2a-setup.md) for the SQL migration, secure connection configuration, local startup and remaining access-control requirements.
+
+With Node.js 24.5+, after applying the migration and configuring the ignored `.env.local`:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open http://localhost:3000 in your browser. The Dashboard is a placeholder; select **Residents** in the sidebar to explore the implemented screens. Select a company/home, then choose **View record**. Selections persist during client-side page navigation, and reset on a full reload. Changing company resets the home to All Homes.
+Open http://127.0.0.1:3000 on the computer running the app. For a production preview, stop dev and run `npm run build` followed by `npm start`. Both servers listen only on loopback. Without Supabase configuration, the UI reports that resident storage is unavailable.
 
-For a production build and local preview:
+## Checks
 
 ```sh
 npm run build
-npm start
-```
-
-Open the same address. Stop the development server before starting the production preview on port 3000.
-
-## Validate
-
-```sh
 npm run typecheck
+npm run test:server
 npx playwright install chromium
-npm run build
 npm test
 ```
 
-On Linux, Playwright may require OS libraries: `npx playwright install --with-deps chromium`. To use an existing Chromium installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium` when running `npm test`. Browser tests start the production server automatically if port 3000 is unused. They cover navigation, selection persistence and resets, home options, resident filtering, reference funders, read-only fields, funding totals, chronological history and tablet layout.
+The server tests verify PostgreSQL migration/RLS behaviour, input/access controls and restart persistence with a PostgREST test double. Browser tests verify the resident forms, errors, preserved navigation/selectors and tablet layout. They do not connect to the live Supabase project; see the setup guide for that outstanding verification.
 
-## Structure
+## Main files
 
-- `app/`: shared layout, Residents routes and placeholder Dashboard, Occupancy, Revenue and Settings routes.
-- `components/`: persistent navigation/scope provider, resident form and placeholder screen.
-- `lib/data.ts`: typed demonstration records and separate company, home, room and funder reference structures. Stable IDs and relationships leave room for a future PostgreSQL persistence layer; no database is connected.
-- `tests/`: Playwright browser acceptance checks.
+- `app/residents/`, `components/resident-master-form.tsx`: directory and two-field forms using the existing layout.
+- `lib/resident-master.ts`, `lib/resident-api.ts`: resident master type and browser-to-local-server requests.
+- `server/`, `scripts/local-server.mjs`: loopback-only HTTP boundary and server-only Supabase client.
+- `supabase/migrations/`: resident master schema with RLS and no public access policies.
+- `.env.example`: connection variable names only; real values stay in ignored local configuration.
+- `tests/`: browser, PostgreSQL, access-control and restart tests using fictional data.
 
-## Scope and limitations
-
-Resident details and periods are deliberately read-only. Disabled dropdowns show the proposed reference choices, with Local Authority and NHS funders selected from the separate reference list. There is no saving, period editing/creation, authentication, billing, accounting integration, production database or occupancy/revenue calculation. Only the illustrative total weekly fee is summed from each period's funding entries.
-
-The directory is scoped by each resident's latest period. An open resident record remains visible when selectors change, with a notice if it falls outside the selection; its complete history remains visible. Period history includes all snapshots in ascending start-date order. Placeholder modules have no operational functionality.
-
-Work is on `feat/application-foundation` for review before merging. No later modules are implemented.
-
-## GitHub Pages demo
-
-The fictional demo can be served without a Node.js server. `GITHUB_PAGES=true npm run build` exports the site to `out/` with the `/care-home-model` URL prefix and directory-based routes. Normal local development and production builds keep their existing behaviour.
-
-The prepared site is published on the `gh-pages` branch. In the repository's **Settings → Pages**, choose **Deploy from a branch**, select **gh-pages** and **/ (root)**, then **Save**. The expected address is https://268h7d4g7j-collab.github.io/care-home-model/ once GitHub completes deployment. All content is fictional and the site has no authentication or data storage.
-
-To refresh this demo, rebuild with the same command and commit the contents of `out/` to `gh-pages`, including an empty `.nojekyll` file. Keep source development on the review branch; generated files belong only on `gh-pages`.
+No periods, funding, calculations, billing, new dashboards or additional resident fields are implemented in Task 2A.

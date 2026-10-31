@@ -1,7 +1,60 @@
 import { test, expect } from "@playwright/test";
-test("navigation, scope reset, filtering and persistence", async ({ page }) => {
+test("create, open and edit a resident master with server-generated IDs", async ({
+  page,
+}) => {
   await page.goto("/residents");
-  await expect(page.getByRole("link", { name: /View record/ })).toHaveCount(3);
+  await page.getByRole("link", { name: "New resident", exact: true }).click();
+  await expect(page.getByLabel("Resident ID", { exact: true })).toHaveValue("");
+  await expect(page.getByLabel("Resident ID", { exact: true })).toHaveAttribute(
+    "readonly",
+    "",
+  );
+  await page
+    .getByLabel("Resident name", { exact: true })
+    .fill("Fictional Browser Resident");
+  await page.getByRole("button", { name: "Save resident" }).click();
+  await expect(page.getByRole("status")).toHaveText(
+    "Resident saved to Supabase.",
+  );
+  const id = await page.getByLabel("Resident ID", { exact: true }).inputValue();
+  expect(id).toMatch(/^[0-9a-f-]{36}$/);
+  await page.getByRole("link", { name: "Open resident record" }).click();
+  await expect(page).toHaveURL(new RegExp(`/residents/${id}$`));
+  await expect(page.getByLabel("Resident name", { exact: true })).toHaveValue(
+    "Fictional Browser Resident",
+  );
+  await page
+    .getByLabel("Resident name", { exact: true })
+    .fill("Fictional Browser Resident Updated");
+  await page.getByRole("button", { name: "Save resident" }).click();
+  await expect(page.getByRole("status")).toHaveText(
+    "Resident saved to Supabase.",
+  );
+  await page.reload();
+  await expect(page.getByLabel("Resident name", { exact: true })).toHaveValue(
+    "Fictional Browser Resident Updated",
+  );
+  await expect(page.getByLabel("Resident ID", { exact: true })).toHaveValue(id);
+  await expect(page.locator("form input")).toHaveCount(2);
+  await expect(
+    page.getByRole("heading", { name: "Funding breakdown" }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "Back to residents", exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("cell", {
+      name: "Fictional Browser Resident Updated",
+      exact: true,
+    }),
+  ).toBeVisible();
+});
+
+test("existing navigation, company options, reset and selection persistence remain intact", async ({
+  page,
+}) => {
+  await page.goto("/residents");
   const company = page.getByLabel("Company", { exact: true });
   const home = page.getByLabel("Care Home", { exact: true });
   await expect(home.locator("option")).toHaveText([
@@ -16,21 +69,7 @@ test("navigation, scope reset, filtering and persistence", async ({ page }) => {
     "Home A",
     "Home B",
   ]);
-  await expect(page.getByRole("link", { name: /View record/ })).toHaveCount(2);
   await home.selectOption("b");
-  await expect(page.getByRole("link", { name: /View record/ })).toHaveCount(1);
-  await expect(
-    page.getByRole("cell", { name: "Resident B", exact: true }),
-  ).toBeVisible();
-  await page.screenshot({
-    path: "test-results/residents-desktop.png",
-    fullPage: true,
-  });
-  await page.getByRole("link", { name: /View record/ }).click();
-  await expect(
-    page.getByRole("heading", { name: "Resident B", exact: true }),
-  ).toBeVisible();
-  await expect(home).toHaveValue("b");
   for (const label of [
     "Dashboard",
     "Occupancy",
@@ -55,103 +94,45 @@ test("navigation, scope reset, filtering and persistence", async ({ page }) => {
   await expect(home).toHaveValue("all");
   await expect(home.locator("option")).toHaveText(["All Homes", "Home C"]);
   await expect(
-    page.getByRole("cell", { name: "Resident C", exact: true }),
+    page.getByText(/Resident masters contain only ID and name/),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /View record/ })).toHaveCount(1);
-  await home.selectOption("c");
-  await company.selectOption("all");
-  await expect(home).toHaveValue("all");
-  await expect(page.getByRole("link", { name: /View record/ })).toHaveCount(3);
-  await home.selectOption("a");
-  await expect(
-    page.getByRole("cell", { name: "Resident A", exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: /View record/ })).toHaveCount(1);
 });
-test("resident form, reference funding, totals and chronological snapshots", async ({
+
+test("failed writes remain unsaved, names can be retried and errors are explicit", async ({
   page,
 }) => {
-  await page.goto("/residents/RES-001");
-  for (const label of [
-    "Resident ID",
-    "Resident name",
-    "Period start date",
-    "Period end date",
-    "Comments",
-  ]) {
-    await expect(page.getByLabel(label, { exact: true })).toHaveAttribute(
-      "readonly",
-      "",
-    );
-  }
-  await expect(page.getByLabel("Resident ID", { exact: true })).toHaveValue(
-    "RES-001",
+  await page.goto("/residents/new");
+  await page.getByLabel("Resident name", { exact: true }).fill("   ");
+  await page.getByRole("button", { name: "Save resident" }).click();
+  await expect(page.locator("form").getByRole("alert")).toHaveText(
+    "Enter a resident name.",
   );
-  await expect(page.getByLabel("Period end date", { exact: true })).toHaveValue(
-    "",
-  );
-  for (const label of [
-    "Home",
-    "Room",
-    "Stay type",
-    "Care type",
-    "Physical occupancy",
-    "Financial occupancy",
-  ])
-    await expect(page.getByLabel(label, { exact: true })).toBeDisabled();
-  await expect(page.getByLabel("Home", { exact: true })).toHaveValue("a");
-  await expect(
-    page.getByLabel("Room", { exact: true }).locator("option"),
-  ).toHaveText(["101", "102"]);
-  await expect(
-    page.getByLabel("Stay type", { exact: true }).locator("option"),
-  ).toHaveText(["Permanent", "Respite", "D2A"]);
-  await expect(
-    page.getByLabel("Care type", { exact: true }).locator("option"),
-  ).toHaveCount(4);
-  const entries = page.locator("fieldset");
-  await expect(entries).toHaveCount(3);
-  await expect(entries.first().getByLabel("Funding type")).toHaveValue(
-    "Local Authority",
-  );
-  await expect(entries.first().getByLabel("Funder")).toHaveJSProperty(
-    "tagName",
-    "SELECT",
-  );
-  await expect(
-    entries.first().getByLabel("Funder").locator("option"),
-  ).toHaveText(["Example Borough Council", "Demo County Council"]);
-  await expect(entries.nth(1).getByLabel("Funding type")).toHaveValue("FNC");
-  await expect(page.locator(".weekly-total")).toContainText("£1,300.00");
-  const history = page.locator(".history-table tbody tr");
-  await expect(history).toHaveCount(2);
-  await expect(history.first()).toContainText("06 Jan 2025");
-  await expect(history.first()).toContainText("31 Mar 2025");
-  await expect(history.first()).toContainText("£1,100.00");
-  await expect(history.nth(1)).toContainText("01 Apr 2025");
-  await expect(history.nth(1)).toContainText("Ongoing");
-  await expect(
-    page.getByText(
-      "Demonstration only. Fields are read-only and no changes are saved.",
-    ),
-  ).toBeVisible();
   await page
-    .getByLabel("Company", { exact: true })
-    .first()
-    .selectOption("second");
-  await expect(page.getByRole("status")).toContainText("outside your current");
-  await page.goto("/residents/RES-003");
-  await expect(
-    page.locator("fieldset").first().getByLabel("Funder").locator("option"),
-  ).toHaveText(["Example NHS Integrated Care Board"]);
-  await expect(
-    page.getByLabel("Physical occupancy", { exact: true }),
-  ).toHaveValue("No");
-  await expect(page.locator(".weekly-total")).toContainText("£1,300.00");
+    .getByLabel("Resident name", { exact: true })
+    .fill("Fictional unavailable storage");
+  await page.getByRole("button", { name: "Save resident" }).click();
+  await expect(page.locator("form").getByRole("alert")).toContainText(
+    "Supabase could not complete",
+  );
+  await expect(page.getByRole("status")).toHaveCount(0);
+  await expect(page.getByLabel("Resident ID", { exact: true })).toHaveValue("");
+  await expect(page.getByLabel("Resident name", { exact: true })).toHaveValue(
+    "Fictional unavailable storage",
+  );
+  await page
+    .getByLabel("Resident name", { exact: true })
+    .fill("Fictional retry resident");
+  await page.getByRole("button", { name: "Save resident" }).click();
+  await expect(page.getByRole("status")).toHaveText(
+    "Resident saved to Supabase.",
+  );
 });
-test("tablet layout retains selectors and navigation", async ({ page }) => {
+
+test("tablet layout retains the master form, selectors and navigation", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 768, height: 1024 });
-  await page.goto("/residents/RES-001");
+  await page.goto("/residents/new");
   await expect(page.getByLabel("Care Home", { exact: true })).toBeVisible();
   await expect(page.getByRole("navigation")).toBeVisible();
   expect(
@@ -160,7 +141,7 @@ test("tablet layout retains selectors and navigation", async ({ page }) => {
     ),
   ).toBe(true);
   await page.screenshot({
-    path: "test-results/resident-tablet.png",
+    path: "test-results/resident-master-tablet.png",
     fullPage: true,
   });
 });

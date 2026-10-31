@@ -1,28 +1,56 @@
 "use client";
 import Link from "next/link";
-import { ArrowUpRight, UsersRound } from "lucide-react";
-import { PageHeading, useScope } from "@/components/shell";
-import {
-  residents,
-  currentPeriod,
-  matchesScope,
-  homeName,
-  roomName,
-} from "@/lib/data";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, UsersRound, Plus, Info } from "lucide-react";
+import { PageHeading } from "@/components/shell";
+import { listResidents } from "@/lib/resident-api";
+import type { ResidentMaster } from "@/lib/resident-master";
+
 export default function Residents() {
-  const { company, home } = useScope();
-  const visible = residents.filter((resident) =>
-    matchesScope(resident, company, home),
-  );
+  const [residents, setResidents] = useState<ResidentMaster[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+    listResidents()
+      .then((data) => {
+        if (active) setResidents(data);
+      })
+      .catch((cause) => {
+        if (active) setError(cause.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [attempt]);
   return (
     <>
       <PageHeading
         title="Residents"
-        description="View resident records and their care and funding arrangements."
+        description="View and maintain resident master records."
       >
-        <span className="tag">Demonstration data</span>
+        {!loading && !error && (
+          <Link className="primary-button" href="/residents/new">
+            <Plus size={16} />
+            New resident
+          </Link>
+        )}
       </PageHeading>
-      <section className="card">
+      <div className="notice">
+        <Info size={18} />
+        <span>
+          Resident masters contain only ID and name. Company, home and room
+          assignments—and filtering by these selectors—will be available with
+          resident periods.
+        </span>
+      </div>
+      <section className="card" aria-busy={loading}>
         <div className="card-heading">
           <div className="section-title">
             <span className="section-icon">
@@ -30,69 +58,85 @@ export default function Residents() {
             </span>
             <div>
               <h2>Resident directory</h2>
-              <p>Residents in your selected company and home</p>
+              <p>Resident master records · local-only access</p>
             </div>
           </div>
-          <span className="count">
-            {visible.length} {visible.length === 1 ? "resident" : "residents"}
-          </span>
+          {!loading && !error && (
+            <span className="count">
+              {residents.length}{" "}
+              {residents.length === 1 ? "resident" : "residents"}
+            </span>
+          )}
         </div>
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Resident name</th>
-                <th>Resident ID</th>
-                <th>Current home</th>
-                <th>Current room</th>
-                <th>
-                  <span className="sr-only">Record</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((resident) => {
-                const period = currentPeriod(resident);
-                return (
-                  <tr key={resident.id}>
-                    <td>
-                      <div className="resident-name">
-                        <span className="avatar" aria-hidden="true">
-                          {resident.name.split(" ").at(-1)}
-                        </span>
-                        <strong>{resident.name}</strong>
-                      </div>
-                    </td>
-                    <td className="muted mono">{resident.id}</td>
-                    <td>{homeName(period.homeId)}</td>
-                    <td>
-                      <span className="room">
-                        Room {roomName(period.roomId)}
-                      </span>
-                    </td>
-                    <td>
-                      <Link
-                        className="record-link"
-                        href={`/residents/${resident.id}`}
-                      >
-                        View record <ArrowUpRight size={16} />
-                        <span className="sr-only"> for {resident.name}</span>
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {!visible.length && (
-          <div className="empty">
-            No residents match the selected company and home.
+        {loading ? (
+          <p className="empty" role="status">
+            Loading residents…
+          </p>
+        ) : error ? (
+          <div className="storage-message">
+            <p role="alert">{error}</p>
+            <button
+              className="secondary-button"
+              onClick={() => setAttempt((value) => value + 1)}
+            >
+              Retry connection
+            </button>
           </div>
+        ) : (
+          <>
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Resident name</th>
+                    <th>Resident ID</th>
+                    <th>Current home</th>
+                    <th>Current room</th>
+                    <th>
+                      <span className="sr-only">Record</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {residents.map((resident) => (
+                    <tr key={resident.id}>
+                      <td>
+                        <div className="resident-name">
+                          <span className="avatar" aria-hidden="true">
+                            {resident.name.slice(0, 1)}
+                          </span>
+                          <strong>{resident.name}</strong>
+                        </div>
+                      </td>
+                      <td className="muted mono">{resident.id}</td>
+                      <td className="muted">Not assigned</td>
+                      <td className="muted">Not assigned</td>
+                      <td>
+                        <Link
+                          className="record-link"
+                          href={`/residents/${resident.id}`}
+                        >
+                          View record <ArrowUpRight size={16} />
+                          <span className="sr-only"> for {resident.name}</span>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {!residents.length && (
+              <div className="empty">
+                No resident master records yet. Choose New resident to create
+                one.
+              </div>
+            )}
+            <div className="card-foot">
+              Names are stored in Supabase. Company, home and room are not
+              resident master fields.
+            </div>
+          </>
         )}
-        <div className="card-foot">
-          All resident information shown is fictional.
-        </div>
       </section>
     </>
   );
