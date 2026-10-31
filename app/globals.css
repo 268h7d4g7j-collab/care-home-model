@@ -800,3 +800,5 @@ button:disabled {
   background: #eaf4f0;
   color: #236c50;
 }
+
+.period-editor { border: 0; padding: 0; margin: 0; min-width: 0; }

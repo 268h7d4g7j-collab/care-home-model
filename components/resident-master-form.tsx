@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { ResidentPeriods } from "./resident-periods";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, UserRound, Info } from "lucide-react";
 import { PageHeading } from "./shell";
@@ -93,8 +94,8 @@ export function ResidentMasterForm({ id }: { id?: string }) {
       <div className="notice">
         <Info size={18} />
         <span>
-          This record contains the resident ID and name. Home and room
-          assignments will be available later.
+          Resident details contain the ID and name. Periods hold home, room and
+          funding history.
         </span>
       </div>
       <section className="card" aria-busy={loading || saving}>
@@ -180,6 +181,7 @@ export function ResidentMasterForm({ id }: { id?: string }) {
           </form>
         )}
       </section>
+      {id && resident && <ResidentPeriods residentId={id} />}
     </>
   );
 }

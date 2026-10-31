@@ -2,11 +2,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, UsersRound, Plus, Info } from "lucide-react";
+import { useScope } from "@/components/shell";
+import { residentRequest } from "@/lib/resident-api";
+import type { ResidentPeriod } from "@/lib/periods";
 import { PageHeading } from "@/components/shell";
 import { listResidents } from "@/lib/resident-api";
 import type { ResidentMaster } from "@/lib/resident-master";
 
 export default function Residents() {
+  const { company, home, references } = useScope();
+  const [periods, setPeriods] = useState<Record<string, ResidentPeriod[]>>({});
   const [residents, setResidents] = useState<ResidentMaster[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,7 +21,17 @@ export default function Residents() {
     setLoading(true);
     setError("");
     listResidents()
-      .then((data) => {
+      .then(async (data) => {
+        const snapshots = await Promise.all(
+          data.map(
+            async (r) =>
+              [
+                r.id,
+                await residentRequest<ResidentPeriod[]>(`/api/periods/${r.id}`),
+              ] as const,
+          ),
+        );
+        if (active) setPeriods(Object.fromEntries(snapshots));
         if (active) setResidents(data);
       })
       .catch((cause) => {
@@ -25,10 +40,22 @@ export default function Residents() {
       .finally(() => {
         if (active) setLoading(false);
       });
+
     return () => {
       active = false;
     };
   }, [attempt]);
+  const visible = residents.filter(
+    (r) =>
+      (company === "all" && home === "all") ||
+      (periods[r.id] ?? []).some(
+        (p) =>
+          (home === "all" || p.home_id === home) &&
+          (company === "all" ||
+            references?.homes.find((h) => h.id === p.home_id)?.company_id ===
+              company),
+      ),
+  );
   return (
     <>
       <PageHeading
@@ -45,9 +72,8 @@ export default function Residents() {
       <div className="notice">
         <Info size={18} />
         <span>
-          Resident masters contain only ID and name. Company, home and room
-          assignments—and filtering by these selectors—will be available with
-          resident periods.
+          Resident masters contain only ID and name. Company and home filters
+          include matching period history.
         </span>
       </div>
       <section className="card" aria-busy={loading}>
@@ -63,8 +89,7 @@ export default function Residents() {
           </div>
           {!loading && !error && (
             <span className="count">
-              {residents.length}{" "}
-              {residents.length === 1 ? "resident" : "residents"}
+              {visible.length} {visible.length === 1 ? "resident" : "residents"}
             </span>
           )}
         </div>
@@ -90,15 +115,15 @@ export default function Residents() {
                   <tr>
                     <th>Resident name</th>
                     <th>Resident ID</th>
-                    <th>Current home</th>
-                    <th>Current room</th>
+                    <th>Latest period home</th>
+                    <th>Latest period room</th>
                     <th>
                       <span className="sr-only">Record</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {residents.map((resident) => (
+                  {visible.map((resident) => (
                     <tr key={resident.id}>
                       <td>
                         <div className="resident-name">
@@ -109,8 +134,16 @@ export default function Residents() {
                         </div>
                       </td>
                       <td className="muted mono">{resident.id}</td>
-                      <td className="muted">Not assigned</td>
-                      <td className="muted">Not assigned</td>
+                      <td className="muted">
+                        {references?.homes.find(
+                          (h) => h.id === periods[resident.id]?.at(-1)?.home_id,
+                        )?.name ?? "Not assigned"}
+                      </td>
+                      <td className="muted">
+                        {references?.rooms.find(
+                          (r) => r.id === periods[resident.id]?.at(-1)?.room_id,
+                        )?.name ?? "Not assigned"}
+                      </td>
                       <td>
                         <Link
                           className="record-link"
@@ -125,10 +158,9 @@ export default function Residents() {
                 </tbody>
               </table>
             </div>
-            {!residents.length && (
+            {!visible.length && (
               <div className="empty">
-                No resident master records yet. Choose New resident to create
-                one.
+                No matching resident records. Choose New resident to create one.
               </div>
             )}
             <div className="card-foot">

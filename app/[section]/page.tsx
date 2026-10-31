@@ -1,3 +1,4 @@
+import { ReferenceData } from "@/components/reference-data";
 import { notFound } from "next/navigation";
 import { Placeholder } from "@/components/placeholder";
 const titles: Record<string, string> = {
@@ -15,5 +16,6 @@ export default async function Page({
 }) {
   const { section } = await params;
   if (!titles[section]) notFound();
+  if (section === "settings") return <ReferenceData />;
   return <Placeholder title={titles[section]} />;
 }

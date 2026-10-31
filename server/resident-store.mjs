@@ -29,7 +29,7 @@ export function residentName(payload) {
 
 // This module is imported only by the loopback HTTP server, never by Next pages
 // or browser components. It never logs or returns connection credentials.
-export function createResidentStore(environment = process.env) {
+export function createServerClient(environment = process.env) {
   const url = environment.SUPABASE_URL;
   const key = environment.SUPABASE_SECRET_KEY;
   if (!url || !key) {
@@ -63,6 +63,11 @@ export function createResidentStore(environment = process.env) {
       detectSessionInUrl: false,
     },
   });
+  return client;
+}
+
+export function createResidentStore(environment = process.env) {
+  const client = createServerClient(environment);
   const resolve = ({ data, error }) => {
     // Do not leak upstream errors, SQL, credentials, or resident information.
     if (error)

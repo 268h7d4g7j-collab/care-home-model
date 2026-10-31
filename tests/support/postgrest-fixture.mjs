@@ -1,3 +1,4 @@
+import { periodFixture, periodDb } from "./period-fixture.mjs";
 // Test double only: no production code imports this module. It exercises the
 // actual supabase-js HTTP contract without claiming to be a Supabase database.
 import { createServer } from "node:http";
@@ -16,6 +17,7 @@ createServer(async (request, response) => {
     response.end(JSON.stringify(body));
   };
   if (url.pathname === "/health") return send(200, { testDouble: true });
+  if (await periodFixture(request, url, send)) return;
   if (url.pathname !== "/rest/v1/residents") return send(404, {});
   if (request.headers.apikey !== "fictional-test-key")
     return send(401, { message: "Missing test key" });
@@ -42,6 +44,10 @@ createServer(async (request, response) => {
   if (request.method === "POST") {
     resident = { id: randomUUID(), name: payload.name };
     records.push(resident);
+    await periodDb.query("insert into residents(id,name) values($1,$2)", [
+      resident.id,
+      resident.name,
+    ]);
   } else if (request.method === "PATCH") {
     resident = records.find((item) => item.id === id);
     if (resident) resident.name = payload.name;

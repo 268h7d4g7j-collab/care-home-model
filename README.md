@@ -1,12 +1,12 @@
 # Care Home Revenue
 
-Next.js / TypeScript application for care home revenue management. Task 2A extends the existing interface with resident master creation, reopening and name editing backed by Supabase. Resident masters contain **only ID and name**.
+Next.js / TypeScript application for care home revenue management. Task 2B extends resident master editing with resident periods, funding snapshots, admissions/discharges, transfers and reference maintenance backed by Supabase. Resident masters contain **only ID and name**.
 
 This branch is **local-only** until authentication and company/home authorization are agreed. Your existing public GitHub Pages demonstration remains unchanged. Do not put Supabase privileged keys in browser code or publish an unrestricted database.
 
 ## Setup and run
 
-See [Task 2A setup](docs/task-2a-setup.md) for the SQL migration, secure connection configuration, local startup and remaining access-control requirements.
+See [Task 2B setup and verification](docs/task-2b-setup.md) for the SQL migration, secure connection configuration, local startup and remaining access-control requirements.
 
 With Node.js 24.5+, after applying the migration and configuring the ignored `.env.local`:
 
@@ -27,7 +27,7 @@ npx playwright install chromium
 npm test
 ```
 
-The server tests verify PostgreSQL migration/RLS behaviour, input/access controls and restart persistence with a PostgREST test double. Browser tests verify the resident forms, errors, preserved navigation/selectors and tablet layout. They do not connect to the live Supabase project; see the setup guide for that outstanding verification.
+The server tests verify PostgreSQL migration/RLS behaviour, input/access controls and restart persistence with a PostgREST test double. Browser tests verify the resident forms, errors, preserved navigation/selectors and tablet layout. Browser tests use a disposable PostgreSQL-backed fixture. Hosted transaction verification and its limits are recorded in the Task 2B guide.
 
 ## Main files
 
@@ -38,4 +38,4 @@ The server tests verify PostgreSQL migration/RLS behaviour, input/access control
 - `.env.example`: connection variable names only; real values stay in ignored local configuration.
 - `tests/`: browser, PostgreSQL, access-control and restart tests using fictional data.
 
-No periods, funding, calculations, billing, new dashboards or additional resident fields are implemented in Task 2A.
+Task 2B adds periods, manual weekly funding and reference maintenance. Occupancy dashboards, revenue calculations, billing and additional resident master fields remain outside scope.

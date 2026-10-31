@@ -1,3 +1,5 @@
+import { createPeriodStore } from "../server/period-store.mjs";
+import { handlePeriodApi } from "../server/period-api.mjs";
 import { createServer } from "node:http";
 import next from "next";
 import nextEnv from "@next/env";
@@ -16,6 +18,7 @@ const app = next({ dev, hostname: "127.0.0.1", port });
 await app.prepare();
 const handle = app.getRequestHandler();
 let store;
+let periodStore;
 const storeFactory = () => (store ??= createResidentStore());
 const server = createServer(async (request, response) => {
   // Enforce the boundary using the socket peer as well as Host/Origin. The bind
@@ -33,7 +36,16 @@ const server = createServer(async (request, response) => {
     );
     return;
   }
-  if (request.url?.startsWith("/api/residents")) {
+  if (
+    request.url?.startsWith("/api/periods") ||
+    request.url?.startsWith("/api/references")
+  ) {
+    await handlePeriodApi(
+      request,
+      response,
+      () => (periodStore ??= createPeriodStore()),
+    );
+  } else if (request.url?.startsWith("/api/residents")) {
     await handleResidentApi(request, response, storeFactory);
   } else {
     await handle(request, response);

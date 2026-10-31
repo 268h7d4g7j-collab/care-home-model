@@ -1,7 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   Building2,
   LayoutDashboard,
@@ -12,8 +18,13 @@ import {
   HeartHandshake,
   ChevronRight,
 } from "lucide-react";
-import { companies, homes } from "@/lib/data";
-const Scope = createContext({ company: "all", home: "all" });
+import { residentRequest } from "@/lib/resident-api";
+import type { References } from "@/lib/periods";
+const Scope = createContext<{
+  company: string;
+  home: string;
+  references: References | null;
+}>({ company: "all", home: "all", references: null });
 export const useScope = () => useContext(Scope);
 const navigation = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -25,9 +36,22 @@ const navigation = [
 export function Shell({ children }: { children: ReactNode }) {
   const [company, setCompany] = useState("all");
   const [home, setHome] = useState("all");
+  const [references, setReferences] = useState<References | null>(null);
+  useEffect(() => {
+    const load = () => {
+      void residentRequest<References>("/api/references")
+        .then(setReferences)
+        .catch(() => {});
+    };
+    load();
+    window.addEventListener("references-updated", load);
+    return () => window.removeEventListener("references-updated", load);
+  }, []);
+  const companies = references?.companies ?? [];
+  const homes = references?.homes ?? [];
   const pathname = usePathname();
   return (
-    <Scope.Provider value={{ company, home }}>
+    <Scope.Provider value={{ company, home, references }}>
       <div className="app-shell">
         <header className="topbar">
           <Link href="/" className="brand">
@@ -67,7 +91,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <option value="all">All Homes</option>
                 {homes
                   .filter(
-                    (item) => company === "all" || item.companyId === company,
+                    (item) => company === "all" || item.company_id === company,
                   )
                   .map((item) => (
                     <option key={item.id} value={item.id}>
@@ -125,7 +149,9 @@ export function PageHeading({
   description: string;
   children?: ReactNode;
 }) {
-  const { company, home } = useScope();
+  const { company, home, references } = useScope();
+  const companies = references?.companies ?? [];
+  const homes = references?.homes ?? [];
   return (
     <>
       <div className="breadcrumb">

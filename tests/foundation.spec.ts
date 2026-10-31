@@ -35,7 +35,7 @@ test("create, open and edit a resident master with server-generated IDs", async 
     "Fictional Browser Resident Updated",
   );
   await expect(page.getByLabel("Resident ID", { exact: true })).toHaveValue(id);
-  await expect(page.locator("form input")).toHaveCount(2);
+  await expect(page.locator("form").first().locator("input")).toHaveCount(2);
   await expect(
     page.getByRole("heading", { name: "Funding breakdown" }),
   ).toHaveCount(0);
@@ -63,13 +63,15 @@ test("existing navigation, company options, reset and selection persistence rema
     "Home B",
     "Home C",
   ]);
-  await company.selectOption("example");
+  await company.selectOption({ label: "Example Care Group" });
+  const companyId = await company.inputValue();
   await expect(home.locator("option")).toHaveText([
     "All Homes",
     "Home A",
     "Home B",
   ]);
-  await home.selectOption("b");
+  await home.selectOption({ label: "Home B" });
+  const homeId = await home.inputValue();
   for (const label of [
     "Dashboard",
     "Occupancy",
@@ -84,13 +86,13 @@ test("existing navigation, company options, reset and selection persistence rema
     await expect(
       page.getByRole("heading", { level: 1, name: label, exact: true }),
     ).toBeVisible();
-    await expect(home).toHaveValue("b");
-    await expect(company).toHaveValue("example");
+    await expect(home).toHaveValue(homeId);
+    await expect(company).toHaveValue(companyId);
     await expect(
       page.getByRole("navigation").getByRole("link", { name: label }),
     ).toHaveAttribute("aria-current", "page");
   }
-  await company.selectOption("second");
+  await company.selectOption({ label: "Second Care Group" });
   await expect(home).toHaveValue("all");
   await expect(home.locator("option")).toHaveText(["All Homes", "Home C"]);
   await expect(

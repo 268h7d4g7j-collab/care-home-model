@@ -7,3 +7,4 @@ test-results/
 out/
 .env*
 !.env.example
+supabase/.temp/
