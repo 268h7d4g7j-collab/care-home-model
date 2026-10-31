@@ -1,0 +1,26 @@
+1:"$Sreact.fragment"
+2:"/care-home-model/_next/static/chunks/331tlmcuzd4f_.js"
+3:I[138,["$2"],"Shell"]
+4:I[39756,["$2"],"default"]
+5:I[37457,["$2"],"default"]
+6:I[22016,["$2"],""]
+c:I[97367,["$2"],"OutletBoundary"]
+d:"$Sreact.suspense"
+f:"ViewportBoundary"
+10:I[97367,["$2"],"$f"]
+12:"MetadataBoundary"
+13:I[97367,["$2"],"$12"]
+15:I[68027,["$2"],"default",1]
+:HL["/care-home-model/_next/static/chunks/04hv7k9oq-pv7.css","style"]
+8:X
+a:[["children",{"s":"__PAGE__","h":512,"d":{"r":["$","$1","c",{"children":["$Lb",[["$","script","script-0",{"src":"/care-home-model/_next/static/chunks/1c5p8x9qo_ma0.js","async":true,"nonce":"$undefined"}]],["$","$Lc",null,{"children":["$","$d",null,{"name":"Next.MetadataOutlet","children":"$@e"}]}]]}],"p":false,"v":null}}]]
+9:[["children",{"s":{"n":"id","t":"d","k":"RES-001","s":[]},"h":512,"d":{"r":["$","$1","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],"p":false,"v":"$8"},"c":"$Qa"}]]
+7:[["children",{"s":"residents","h":512,"d":{"r":["$","$1","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],"p":false,"v":"$8"},"c":"$Q9"}]]
+0:{"P":null,"c":["","residents","RES-001",""],"q":"","i":false,"t":{"t":{"s":"","h":528,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/care-home-model/_next/static/chunks/04hv7k9oq-pv7.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/care-home-model/_next/static/chunks/331tlmcuzd4f_.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en-GB","children":["$","body",null,{"children":["$","$L3",null,{"children":["$","$L4",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","section",null,{"className":"card placeholder","children":[["$","h1",null,{"children":"Page not found"}],["$","p",null,{"children":"This page or resident record does not exist."}],["$","$L6",null,{"className":"record-link","href":"/residents","children":"Return to residents"}]]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]}]]}],"p":false,"v":null},"c":"$Q7"},"h":{"r":["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","$L13",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$d",null,{"name":"Next.Metadata","children":"$L14"}]}],null]}],null]}],"p":false,"v":null}},"m":"$undefined","G":["$15",[["$","link","0",{"rel":"stylesheet","href":"/care-home-model/_next/static/chunks/04hv7k9oq-pv7.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"S":true,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"_g8pOVVYk59rBsYF3cCHg"}
+16:"/care-home-model/_next/static/chunks/1c5p8x9qo_ma0.js"
+17:I[21890,["$2","$16"],"ResidentDetail"]
+8:C
+b:["$","$L17",null,{"resident":{"id":"RES-001","name":"Resident A","periods":[{"id":"p1","start":"2025-01-06","end":"2025-03-31","homeId":"a","roomId":"a02","stayType":"Respite","careType":"Residential","physicalOccupancy":true,"financialOccupancy":true,"comments":"Fictional respite period before a permanent stay.","funding":[{"id":"f1","type":"Private / Self-funded","weeklyAmount":1100}]},{"id":"p2","start":"2025-04-01","homeId":"a","roomId":"a01","stayType":"Permanent","careType":"Nursing","physicalOccupancy":true,"financialOccupancy":true,"comments":"Fictional ongoing placement. All information is demonstration data.","funding":[{"id":"f2","type":"Local Authority","funderId":"la1","weeklyAmount":950},{"id":"f3","type":"FNC","weeklyAmount":250},{"id":"f4","type":"Third-party top-up","weeklyAmount":100}]}]}}]
+11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+e:null
+14:[["$","title","0",{"children":"Care Home Revenue"}],["$","meta","1",{"name":"description","content":"Care home revenue management — fictional demonstration workspace"}]]

@@ -1,0 +1,26 @@
+1:"$Sreact.fragment"
+2:"/care-home-model/_next/static/chunks/331tlmcuzd4f_.js"
+3:I[138,["$2"],"Shell"]
+4:I[39756,["$2"],"default"]
+5:I[37457,["$2"],"default"]
+6:I[22016,["$2"],""]
+a:"/care-home-model/_next/static/chunks/0_ws3lozme25c.js"
+b:I[22029,["$2","$a"],"Placeholder"]
+c:I[97367,["$2"],"OutletBoundary"]
+d:"$Sreact.suspense"
+10:"ViewportBoundary"
+11:I[97367,["$2"],"$10"]
+12:"MetadataBoundary"
+13:I[97367,["$2"],"$12"]
+:HL["/care-home-model/_next/static/chunks/04hv7k9oq-pv7.css","style"]
+8:X
+9:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","$Lb",null,{"title":"Dashboard"}],[["$","script","script-0",{"src":"/care-home-model/_next/static/chunks/0_ws3lozme25c.js","async":true}]],["$","$Lc",null,{"children":["$","$d",null,{"name":"Next.MetadataOutlet","children":"$@e"}]}]]}],"p":"$@f","v":null,"s":"$8"}}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/care-home-model/_next/static/chunks/04hv7k9oq-pv7.css","precedence":"next"}],["$","script","script-0",{"src":"/care-home-model/_next/static/chunks/331tlmcuzd4f_.js","async":true}]],["$","html",null,{"lang":"en-GB","children":["$","body",null,{"children":["$","$L3",null,{"children":["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}],"notFound":[["$","section",null,{"className":"card placeholder","children":[["$","h1",null,{"children":"Page not found"}],["$","p",null,{"children":"This page or resident record does not exist."}],["$","$L6",null,{"className":"record-link","href":"/residents","children":"Return to residents"}]]}],[]]}]}]}]}]]}],"p":"$@7","v":null,"s":"$8"},"c":"$Q9"},"h":{"r":["$","$1","h",{"children":[null,["$","$L11",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L13",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$d",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Care Home Revenue"}],["$","meta","1",{"name":"description","content":"Care home revenue management — fictional demonstration workspace"}]]}]}],null]}],null]}],"p":"$@14","v":null,"s":"$8"}},"a":"$@15","u":"$@16","b":"_g8pOVVYk59rBsYF3cCHg"}
+e:null
+8:300
+16:true
+8:C
+15:0
+7:"$undefined"
+14:"$undefined"
+f:"$undefined"

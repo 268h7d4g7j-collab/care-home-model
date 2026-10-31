@@ -1,0 +1,4 @@
+:HL["/care-home-model/_next/static/chunks/04hv7k9oq-pv7.css","style"]
+2:[["children",{"s":"__PAGE__","h":160}]]
+1:[["children",{"s":{"n":"section","t":"d","k":"settings","s":["residents"]},"h":96,"c":"$Q2"}]]
+0:{"b":"_g8pOVVYk59rBsYF3cCHg","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
